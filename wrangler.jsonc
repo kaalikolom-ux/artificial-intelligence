@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "artificial-intelligence",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "artificial-intelligence",
+      "database_id": "7bdcdc2b-27b5-40a5-96b5-802c3e65d645"
+    }
+  ]
+}

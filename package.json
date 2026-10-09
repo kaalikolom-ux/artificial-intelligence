@@ -1,0 +1,40 @@
+{
+  "name": "artificial-intelligence",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "pages:dev": "wrangler pages dev dist --compatibility-date=2024-09-23 --d1=DB=7bdcdc2b-27b5-40a5-96b5-802c3e65d645",
+    "pages:deploy": "bun run build && wrangler pages deploy dist",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 execute artificial-intelligence --local --file=./migrations/0000_initial.sql",
+    "db:migrate:remote": "wrangler d1 execute artificial-intelligence --remote --file=./migrations/0000_initial.sql"
+  },
+  "dependencies": {
+    "@codesandbox/sandpack-react": "^2.19.10",
+    "@monaco-editor/react": "^4.7.0",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "^0.39.3",
+    "hono": "^4.7.2",
+    "lucide-react": "^1.16.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.30.5",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0",
+    "wrangler": "^3.111.0"
+  }
+}
