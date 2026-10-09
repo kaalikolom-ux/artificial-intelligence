@@ -19,6 +19,8 @@ export function App() {
     user,
     isLoading,
     isSaving,
+    selectedModel,
+    handleSelectModel,
     updateFileContent,
     saveFilesToD1,
     sendMessage,
@@ -48,6 +50,8 @@ export function App() {
           messages={messages}
           onSendMessage={sendMessage}
           isLoading={isLoading}
+          selectedModel={selectedModel}
+          onSelectModel={handleSelectModel}
         />
 
         {/* Right Workspace (Split / Code / Preview) */}

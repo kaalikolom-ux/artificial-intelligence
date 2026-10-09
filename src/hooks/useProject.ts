@@ -10,28 +10,31 @@ export function useProject() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [selectedModel, setSelectedModel] = useState<string>(() => {
+    return localStorage.getItem("lovable_selected_model") || "cf-deepseek-r1";
+  });
+
+  const handleSelectModel = (modelId: string) => {
+    setSelectedModel(modelId);
+    localStorage.setItem("lovable_selected_model", modelId);
+  };
 
   // 1. Load initial user and project (or create one in D1)
   useEffect(() => {
     async function init() {
       try {
-        // Fetch current user
         const userRes = await fetch("/api/auth/me");
         if (userRes.ok) {
           const userData = await userRes.json();
           setUser(userData.user);
         }
 
-        // Fetch or create initial project
         const projRes = await fetch("/api/projects");
         if (projRes.ok) {
           const data = await projRes.json();
           if (data.projects && data.projects.length > 0) {
-            // Load existing project
-            const current = data.projects[0];
-            loadProject(current.id);
+            loadProject(data.projects[0].id);
           } else {
-            // Create default project
             createProject("My Lovable App");
           }
         }
@@ -110,8 +113,17 @@ export function useProject() {
     };
     setMessages((prev) => [...prev, userMsg]);
 
-    const localApiKey = localStorage.getItem("lovable_ai_key") || "";
-    const localProvider = localStorage.getItem("lovable_ai_provider") || "gemini";
+    // Retrieve API key relevant to the selected model if needed
+    let key = "";
+    if (selectedModel === "claude-3-5-sonnet") {
+      key = localStorage.getItem("lovable_anthropic_key") || "";
+    } else if (selectedModel === "kimi-3") {
+      key = localStorage.getItem("lovable_kimi_key") || "";
+    } else if (selectedModel.includes("gemini")) {
+      key = localStorage.getItem("lovable_gemini_key") || "";
+    } else if (selectedModel.includes("openrouter")) {
+      key = localStorage.getItem("lovable_openrouter_key") || "";
+    }
 
     try {
       const res = await fetch("/api/chat", {
@@ -120,8 +132,8 @@ export function useProject() {
         body: JSON.stringify({
           projectId: project.id,
           prompt,
-          userApiKey: localApiKey || undefined,
-          provider: localProvider,
+          model: selectedModel,
+          userApiKey: key || undefined,
         }),
       });
 
@@ -130,7 +142,6 @@ export function useProject() {
         throw new Error(data.error || "Failed to process AI response");
       }
 
-      // Add assistant message
       setMessages((prev) => [
         ...prev,
         {
@@ -140,7 +151,6 @@ export function useProject() {
         },
       ]);
 
-      // If AI generated new/modified files, update the sandbox and active files
       if (data.filesUpdated && data.filesUpdated.length > 0) {
         setFiles((prev) => {
           const map = new Map(prev.map((f) => [f.path, f]));
@@ -150,7 +160,6 @@ export function useProject() {
           return Array.from(map.values());
         });
 
-        // Switch active file to the first modified file
         if (data.filesUpdated[0]?.path) {
           setActiveFilePath(data.filesUpdated[0].path);
         }
@@ -181,6 +190,8 @@ export function useProject() {
     user,
     isLoading,
     isSaving,
+    selectedModel,
+    handleSelectModel,
     updateFileContent,
     saveFilesToD1,
     sendMessage,
